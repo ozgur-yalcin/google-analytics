@@ -29,21 +29,28 @@ func main() {
 	client.ProtocolVersion = "1"
 	client.TrackingID = "UA-xxxxxxxx-xx"
 	client.DataSource = "web"
+	client.HitType = "pageview"
+	client.DocumentHostName = "example.com"
+	client.DocumentPath = "/payment"
+	client.DocumentTitle = "Payment"
 	client.ClientID = uuid.New().String()
-	client.HitType = "transaction"
 
 	product := new(ga.Product)
+	product.Action = "purchase"
 	product.SKU = "P1234"
-	product.Name = "test"
-	product.Brand = "test"
+	product.Name = "name"
+	product.Brand = "brand"
+	product.Category = "category"
+	product.Variant = "variant"
 	product.Price = "25.00"
 	product.Quantity = "1"
-	product.Action = "purchase"
+	product.Position = "1"
 	client.Products = append(client.Products, product)
 
-	client.TransactionID = "1111-1"
+	client.TransactionID = "T1234"
+	client.TransactionAffiliation = "affiliation"
 	client.TransactionRevenue = "25.00"
-	client.TransactionTax = "0.00"
+	client.TransactionTax = "1.00"
 
 	client.CurrencyCode = "TRY"
 	api.Send(client)
