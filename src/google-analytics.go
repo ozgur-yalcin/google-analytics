@@ -236,6 +236,9 @@ func (api *API) Send(client *Client) string {
 	res, err := cli.Do(req)
 	if err != nil {
 		return err.Error()
+	} else {
+		fmt.Println(config.ApiUrl)
+		fmt.Println(res.Status)
 	}
 	defer res.Body.Close()
 	read, err := ioutil.ReadAll(res.Body)

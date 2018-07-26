@@ -25,10 +25,10 @@ func main() {
 	product.Action = "purchase"
 	client.Products = append(client.Products, product)
 
-	client.TransactionID = "1111"
+	client.TransactionID = "1111-1"
 	client.TransactionRevenue = "25.00"
 	client.TransactionTax = "0.00"
 
-	client.CurrencyCode = "USD"
+	client.CurrencyCode = "TRY"
 	api.Send(client)
 }
