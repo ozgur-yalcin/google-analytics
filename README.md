@@ -57,5 +57,4 @@ func main() {
 	client.CurrencyCode = "TRY"
 
 	api.Send(client)
-}
 ```
