@@ -51,8 +51,8 @@ func main() {
 	client.TransactionAffiliation = "affiliation"
 	client.TransactionRevenue = "25.00"
 	client.TransactionTax = "1.00"
-
 	client.CurrencyCode = "TRY"
+
 	api.Send(client)
 }
 ```
