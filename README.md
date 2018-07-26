@@ -12,7 +12,7 @@ The MIT License (MIT). Please see License File for more information.
 go get github.com/OzqurYalcin/google-analytics
 ```
 
-# Usage
+# Measuring Purchases Example
 ```go
 package main
 
