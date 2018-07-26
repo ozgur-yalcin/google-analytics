@@ -225,7 +225,6 @@ func (api *API) Send(client *Client) string {
 	decoder.Decode(&iface)
 	apidata = api.ParseStruct("", iface)
 	postdata := api.ParseQuery("?" + strings.Join(apidata, "&"))
-	fmt.Println(postdata)
 	cli := new(http.Client)
 	req, err := http.NewRequest("POST", config.ApiUrl, strings.NewReader(postdata))
 	if err != nil {
@@ -238,6 +237,7 @@ func (api *API) Send(client *Client) string {
 		return err.Error()
 	} else {
 		fmt.Println(config.ApiUrl)
+		fmt.Println(postdata)
 		fmt.Println(res.Status)
 	}
 	defer res.Body.Close()
