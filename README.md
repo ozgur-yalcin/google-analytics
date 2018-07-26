@@ -1,4 +1,5 @@
 # Google-Analytics
+An easy-to-use Google Analytics API (v1) via Measurement Protocol with golang
 
 # Security
 If you discover any security related issues, please email ozguryalcin@outlook.com instead of using the issue tracker.
