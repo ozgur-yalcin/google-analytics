@@ -13,9 +13,20 @@ func main() {
 	client := new(ga.Client)
 	client.ProtocolVersion = "1"
 	client.TrackingID = "UA-xxxxxxxx-xx"
-	client.UserID = ""
+	client.HitType = "transaction"
 
-	client.CurrencyCode = "TRY"
+	product := new(ga.Product)
+	product.Name = "-"
+	product.Price = "0.00"
+	product.Quantity = "1"
+	product.Brand = "-"
+	product.Action = "purchase"
+	client.Products = append(client.Products, product)
+
+	client.TransactionID = ""
+	client.TransactionRevenue = "0.00"
+
+	client.CurrencyCode = "USD"
 	response := api.Send(client)
 	fmt.Println(response)
 }

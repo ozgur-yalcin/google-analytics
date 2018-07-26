@@ -1,163 +1,245 @@
 package ga
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/url"
+	"reflect"
 	"strings"
 	"sync"
 
 	"github.com/OzqurYalcin/google-analytics/config"
-	"github.com/google/go-querystring/query"
 )
 
 type API struct {
 	sync.Mutex
 }
 
+type Product struct {
+	SKU             string   `json:"id,omitempty"`
+	Name            string   `json:"nm,omitempty"`
+	Brand           string   `json:"br,omitempty"`
+	Category        string   `json:"ca,omitempty"`
+	Variant         string   `json:"va,omitempty"`
+	Price           string   `json:"pr,omitempty"`
+	Quantity        string   `json:"qt,omitempty"`
+	CouponCode      string   `json:"cc,omitempty"`
+	Position        string   `json:"ps,omitempty"`
+	CustomDimension []string `json:"cd,omitempty"`
+	CustomMetric    []string `json:"cm,omitempty"`
+	Action          string   `json:"pa,omitempty"`
+	ActionList      string   `json:"pal,omitempty"`
+}
+
+type ProductImpression struct {
+	ListName []string `json:"nm,omitempty"`
+	Product  []struct {
+		SKU             string   `json:"id,omitempty"`
+		Name            string   `json:"nm,omitempty"`
+		Brand           string   `json:"br,omitempty"`
+		Category        string   `json:"ca,omitempty"`
+		Variant         string   `json:"va,omitempty"`
+		Position        string   `json:"ps,omitempty"`
+		Price           []string `json:"pr,omitempty"`
+		CustomDimension []string `json:"cd,omitempty"`
+		CustomMetric    []string `json:"cm,omitempty"`
+	} `json:"pi,omitempty"`
+}
+type Promotion struct {
+	ID       []string `json:"id,omitempty"`
+	Name     []string `json:"nm,omitempty"`
+	Creative []string `json:"cr,omitempty"`
+	Position []string `json:"ps,omitempty"`
+}
+
 type Client struct {
-	ProtocolVersion string `url:"v,omitempty"`
-	TrackingID      string `url:"tid,omitempty"`
-	AnonymizeIP     bool   `url:"aip,omitempty"`
-	DataSource      string `url:"ds,omitempty"`
-	QueueTime       int64  `url:"qt,omitempty"`
-	CacheBuster     string `url:"z,omitempty"`
+	ProtocolVersion string `json:"v,omitempty"`
+	TrackingID      string `json:"tid,omitempty"`
+	AnonymizeIP     string `json:"aip,omitempty"`
+	DataSource      string `json:"ds,omitempty"`
+	QueueTime       string `json:"qt,omitempty"`
+	CacheBuster     string `json:"z,omitempty"`
 
-	ClientID string `url:"cid,omitempty"`
-	UserID   string `url:"uid,omitempty"`
+	ClientID string `json:"cid,omitempty"`
+	UserID   string `json:"uid,omitempty"`
 
-	SessionControl       string `url:"sc,omitempty"`
-	IPOverride           string `url:"uip,omitempty"`
-	UserAgentOverride    string `url:"ua,omitempty"`
-	GeographicalOverride string `url:"geoid,omitempty"`
+	SessionControl       string `json:"sc,omitempty"`
+	IPOverride           string `json:"uip,omitempty"`
+	UserAgentOverride    string `json:"ua,omitempty"`
+	GeographicalOverride string `json:"geoid,omitempty"`
 
-	DocumentReferrer   string `url:"dr,omitempty"`
-	CampaignName       string `url:"cn,omitempty"`
-	CampaignSource     string `url:"cs,omitempty"`
-	CampaignMedium     string `url:"cm,omitempty"`
-	CampaignKeyword    string `url:"ck,omitempty"`
-	CampaignContent    string `url:"cc,omitempty"`
-	CampaignID         string `url:"ci,omitempty"`
-	GoogleAdWordsID    string `url:"gclid,omitempty"`
-	GoogleDisplayAdsID string `url:"dclid,omitempty"`
+	DocumentReferrer   string `json:"dr,omitempty"`
+	CampaignName       string `json:"cn,omitempty"`
+	CampaignSource     string `json:"cs,omitempty"`
+	CampaignMedium     string `json:"cm,omitempty"`
+	CampaignKeyword    string `json:"ck,omitempty"`
+	CampaignContent    string `json:"cc,omitempty"`
+	CampaignID         string `json:"ci,omitempty"`
+	GoogleAdWordsID    string `json:"gclid,omitempty"`
+	GoogleDisplayAdsID string `json:"dclid,omitempty"`
 
-	ScreenResolution string `url:"sr,omitempty"`
-	ViewportSize     string `url:"vp,omitempty"`
-	DocumentEncoding string `url:"de,omitempty"`
-	ScreenColors     string `url:"sd,omitempty"`
-	UserLanguage     string `url:"ul,omitempty"`
-	JavaEnabled      bool   `url:"je,omitempty"`
-	FlashVersion     string `url:"fl,omitempty"`
+	ScreenResolution string `json:"sr,omitempty"`
+	ViewportSize     string `json:"vp,omitempty"`
+	DocumentEncoding string `json:"de,omitempty"`
+	ScreenColors     string `json:"sd,omitempty"`
+	UserLanguage     string `json:"ul,omitempty"`
+	JavaEnabled      string `json:"je,omitempty"`
+	FlashVersion     string `json:"fl,omitempty"`
 
-	HitType           string `url:"t,omitempty"`
-	NonInteractionHit bool   `url:"ni,omitempty"`
+	HitType           string `json:"t,omitempty"`
+	NonInteractionHit string `json:"ni,omitempty"`
 
-	DocumentLocationURL string   `url:"dl,omitempty"`
-	DocumentHostName    string   `url:"dh,omitempty"`
-	DocumentPath        string   `url:"dp,omitempty"`
-	DocumentTitle       string   `url:"dt,omitempty"`
-	ScreenName          string   `url:"cd,omitempty"`
-	ContentGroup        []string `url:"cg<gi>,omitempty"`
-	LinkID              string   `url:"linkid,omitempty"`
+	DocumentLocationURL string   `json:"dl,omitempty"`
+	DocumentHostName    string   `json:"dh,omitempty"`
+	DocumentPath        string   `json:"dp,omitempty"`
+	DocumentTitle       string   `json:"dt,omitempty"`
+	ScreenName          string   `json:"cd,omitempty"`
+	ContentGroup        []string `json:"cg,omitempty"`
+	LinkID              string   `json:"linkid,omitempty"`
 
-	ApplicationName        string `url:"an,omitempty"`
-	ApplicationID          string `url:"aid,omitempty"`
-	ApplicationVersion     string `url:"av,omitempty"`
-	ApplicationInstallerID string `url:"aiid,omitempty"`
+	ApplicationName        string `json:"an,omitempty"`
+	ApplicationID          string `json:"aid,omitempty"`
+	ApplicationVersion     string `json:"av,omitempty"`
+	ApplicationInstallerID string `json:"aiid,omitempty"`
 
-	EventCategory string `url:"ec,omitempty"`
-	EventAction   string `url:"ea,omitempty"`
-	EventLabel    string `url:"el,omitempty"`
-	EventValue    int64  `url:"ev,omitempty"`
+	EventCategory string `json:"ec,omitempty"`
+	EventAction   string `json:"ea,omitempty"`
+	EventLabel    string `json:"el,omitempty"`
+	EventValue    string `json:"ev,omitempty"`
 
-	TransactionID          string  `url:"ti,omitempty"`
-	TransactionAffiliation string  `url:"ta,omitempty"`
-	TransactionRevenue     float64 `url:"tr,omitempty"`
-	TransactionShipping    float64 `url:"ts,omitempty"`
-	TransactionTax         float64 `url:"tt,omitempty"`
-	TransactionCouponCode  float64 `url:"tcc,omitempty"`
+	TransactionID          string `json:"ti,omitempty"`
+	TransactionAffiliation string `json:"ta,omitempty"`
+	TransactionRevenue     string `json:"tr,omitempty"`
+	TransactionShipping    string `json:"ts,omitempty"`
+	TransactionTax         string `json:"tt,omitempty"`
+	TransactionCouponCode  string `json:"tcc,omitempty"`
 
-	ItemName     string  `url:"in,omitempty"`
-	ItemPrice    float64 `url:"ip,omitempty"`
-	ItemQuantity int64   `url:"iq,omitempty"`
-	ItemCode     string  `url:"ic,omitempty"`
-	ItemCategory string  `url:"iv,omitempty"`
+	ItemName     string `json:"in,omitempty"`
+	ItemPrice    string `json:"ip,omitempty"`
+	ItemQuantity string `json:"iq,omitempty"`
+	ItemCode     string `json:"ic,omitempty"`
+	ItemCategory string `json:"iv,omitempty"`
 
-	ProductSKU             []string  `url:"pr<pi>id,omitempty"`
-	ProductName            []string  `url:"pr<pi>nm,omitempty"`
-	ProductBrand           []string  `url:"pr<pi>br,omitempty"`
-	ProductCategory        []string  `url:"pr<pi>ca,omitempty"`
-	ProductVariant         []string  `url:"pr<pi>va,omitempty"`
-	ProductPrice           []float64 `url:"pr<pi>pr,omitempty"`
-	ProductQuantity        []int64   `url:"pr<pi>qt,omitempty"`
-	ProductCouponCode      []string  `url:"pr<pi>cc,omitempty"`
-	ProductPosition        []int64   `url:"pr<pi>ps,omitempty"`
-	ProductCustomDimension []string  `url:"pr<pi>cd<di>,omitempty"`
-	ProductCustomMetric    []int64   `url:"pr<oi>cm<mi>,omitempty"`
-	ProductAction          string    `url:"pa,omitempty"`
-	ProductActionList      string    `url:"pal,omitempty"`
+	Products           []*Product           `json:"pr,omitempty"`
+	ProductImpressions []*ProductImpression `json:"il,omitempty"`
+	Promotions         []*Promotion         `json:"promo,omitempty"`
+	PromotionAction    string               `json:"promoa,omitempty"`
 
-	ProductImpressionListName        []string  `url:"il<li>nm,omitempty"`
-	ProductImpressionSKU             []string  `url:"il<li>pi<pi>id,omitempty"`
-	ProductImpressionName            []string  `url:"il<li>pi<pi>nm,omitempty"`
-	ProductImpressionBrand           []string  `url:"il<li>pi<pi>br,omitempty"`
-	ProductImpressionCategory        []string  `url:"il<li>pi<pi>ca,omitempty"`
-	ProductImpressionVariant         []string  `url:"il<li>pi<pi>va,omitempty"`
-	ProductImpressionPosition        []int64   `url:"il<li>pi<pi>ps,omitempty"`
-	ProductImpressionPrice           []float64 `url:"il<li>pi<pi>pr,omitempty"`
-	ProductImpressionCustomDimension []string  `url:"il<li>pi<pi>cd<di>,omitempty"`
-	ProductImpressionCustomMetric    []int64   `url:"il<li>pi<pi>cm<mi>,omitempty"`
+	CheckoutStep       string `json:"cos,omitempty"`
+	CheckoutStepOption string `json:"col,omitempty"`
+	CurrencyCode       string `json:"cu,omitempty"`
 
-	CheckoutStep       int64  `url:"cos,omitempty"`
-	CheckoutStepOption string `url:"col,omitempty"`
-	CurrencyCode       string `url:"cu,omitempty"`
+	SocialNetwork      string `json:"sn,omitempty"`
+	SocialAction       string `json:"sa,omitempty"`
+	SocialActionTarget string `json:"st,omitempty"`
 
-	PromotionID       []string `url:"promo<pi>id,omitempty"`
-	PromotionName     []string `url:"promo<pi>nm,omitempty"`
-	PromotionCreative []string `url:"promo<pi>cr,omitempty"`
-	PromotionPosition []string `url:"promo<pi>ps,omitempty"`
-	PromotionAction   string   `url:"promoa,omitempty"`
+	UserTimingCategory     string `json:"utc,omitempty"`
+	UserTimingVariableName string `json:"utv,omitempty"`
+	UserTimingTime         string `json:"utt,omitempty"`
+	UserTimingLabel        string `json:"utl,omitempty"`
 
-	SocialNetwork      string `url:"sn,omitempty"`
-	SocialAction       string `url:"sa,omitempty"`
-	SocialActionTarget string `url:"st,omitempty"`
+	PageLoadTime         string `json:"plt,omitempty"`
+	PageDownloadTime     string `json:"pdt,omitempty"`
+	DNSTime              string `json:"dns,omitempty"`
+	RedirectResponseTime string `json:"rrt,omitempty"`
+	TCPConnectTime       string `json:"tcp,omitempty"`
+	ServerResponseTime   string `json:"srt,omitempty"`
+	DOMInteractiveTime   string `json:"dit,omitempty"`
+	ContentLoadTime      string `json:"clt,omitempty"`
 
-	UserTimingCategory     string `url:"utc,omitempty"`
-	UserTimingVariableName string `url:"utv,omitempty"`
-	UserTimingTime         int64  `url:"utt,omitempty"`
-	UserTimingLabel        string `url:"utl,omitempty"`
+	ExceptionDescription string `json:"exd,omitempty"`
+	IsExceptionFatal     string `json:"exf,omitempty"`
 
-	PageLoadTime         int64 `url:"plt,omitempty"`
-	PageDownloadTime     int64 `url:"pdt,omitempty"`
-	DNSTime              int64 `url:"dns,omitempty"`
-	RedirectResponseTime int64 `url:"rrt,omitempty"`
-	TCPConnectTime       int64 `url:"tcp,omitempty"`
-	ServerResponseTime   int64 `url:"srt,omitempty"`
-	DOMInteractiveTime   int64 `url:"dit,omitempty"`
-	ContentLoadTime      int64 `url:"clt,omitempty"`
+	CustomDimension []string `json:"cd,omitempty"`
+	CustomMetric    []string `json:"cm,omitempty"`
 
-	ExceptionDescription string `url:"exd,omitempty"`
-	IsExceptionFatal     bool   `url:"exf,omitempty"`
+	ExperimentID      string `json:"xid,omitempty"`
+	ExperimentVariant string `json:"xvar,omitempty"`
+}
 
-	CustomDimension []string `url:"cd<di>,omitempty"`
-	CustomMetric    []int64  `url:"cm<mi>,omitempty"`
+func (api *API) ParseStruct(prefix string, data map[string]interface{}) (values []string) {
+	for k, v := range data {
+		if k != "" && v != nil {
+			t := reflect.ValueOf(v)
+			switch t.Kind() {
+			case reflect.Map:
+				var iface map[string]interface{}
+				r := new(bytes.Buffer)
+				encoder := json.NewEncoder(r)
+				encoder.Encode(t.Interface())
+				decoder := json.NewDecoder(r)
+				decoder.UseNumber()
+				decoder.Decode(&iface)
+				values = append(values, api.ParseStruct(prefix+k, iface)...)
+			case reflect.Slice:
+				for i := 0; i < t.Len(); i++ {
+					f := t.Index(i).Interface()
+					ft := reflect.ValueOf(f)
+					switch ft.Kind() {
+					case reflect.Map:
+						var iface map[string]interface{}
+						r := new(bytes.Buffer)
+						encoder := json.NewEncoder(r)
+						encoder.Encode(ft.Interface())
+						decoder := json.NewDecoder(r)
+						decoder.UseNumber()
+						decoder.Decode(&iface)
+						values = append(values, api.ParseStruct(prefix+k+fmt.Sprintf("%v", i), iface)...)
+					default:
+						d := fmt.Sprintf("%v", t)
+						if d != "" && d != "0" {
+							values = append(values, prefix+k+fmt.Sprintf("%v", i)+"="+d)
+						}
+					}
+				}
+			default:
+				d := fmt.Sprintf("%v", t)
+				if d != "" && d != "0" {
+					values = append(values, prefix+k+"="+d)
+				}
+			}
+		}
+	}
+	return values
+}
 
-	ExperimentID      string `url:"xid,omitempty"`
-	ExperimentVariant string `url:"xvar,omitempty"`
+func (api *API) ParseQuery(str string) string {
+	u, _ := url.Parse(str)
+	q := u.Query()
+	u.RawQuery = q.Encode()
+	ret := u.String()
+	return strings.TrimLeft(ret, "?")
 }
 
 func (api *API) Send(client *Client) string {
-	apidata, _ := query.Values(client)
-	res, err := http.Post(config.ApiUrl, "application/x-www-form-urlencoded", strings.NewReader(apidata.Encode()))
+	var apidata []string
+	var iface map[string]interface{}
+	data := new(bytes.Buffer)
+	encoder := json.NewEncoder(data)
+	encoder.Encode(client)
+	decoder := json.NewDecoder(data)
+	decoder.UseNumber()
+	decoder.Decode(&iface)
+	apidata = api.ParseStruct("", iface)
+	postdata := api.ParseQuery("?" + strings.Join(apidata, "&"))
+	cli := new(http.Client)
+	req, err := http.NewRequest("POST", config.ApiUrl, strings.NewReader(postdata))
 	if err != nil {
-		fmt.Println(err)
+		return err.Error()
+	}
+	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	res, err := cli.Do(req)
+	if err != nil {
 		return err.Error()
 	}
 	defer res.Body.Close()
-	response, err := ioutil.ReadAll(res.Body)
+	read, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		fmt.Println(err)
 		return err.Error()
 	}
-	return string(response)
+	return string(read)
 }
