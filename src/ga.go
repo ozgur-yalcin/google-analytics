@@ -14,10 +14,12 @@ import (
 	"github.com/OzqurYalcin/google-analytics/config"
 )
 
+// API with mutex locking
 type API struct {
 	sync.Mutex
 }
 
+// Product data
 type Product struct {
 	SKU             string   `json:"id,omitempty"`
 	Name            string   `json:"nm,omitempty"`
@@ -34,6 +36,7 @@ type Product struct {
 	ActionList      string   `json:"pal,omitempty"`
 }
 
+// ProductImpression data
 type ProductImpression struct {
 	ListName []string `json:"nm,omitempty"`
 	Product  []struct {
@@ -48,6 +51,8 @@ type ProductImpression struct {
 		CustomMetric    []string `json:"cm,omitempty"`
 	} `json:"pi,omitempty"`
 }
+
+// Promotion data
 type Promotion struct {
 	ID       []string `json:"id,omitempty"`
 	Name     []string `json:"nm,omitempty"`
@@ -55,7 +60,9 @@ type Promotion struct {
 	Position []string `json:"ps,omitempty"`
 }
 
+// Client data
 type Client struct {
+	// General
 	ProtocolVersion string `json:"v,omitempty"`
 	TrackingID      string `json:"tid,omitempty"`
 	AnonymizeIP     string `json:"aip,omitempty"`
@@ -63,14 +70,17 @@ type Client struct {
 	QueueTime       string `json:"qt,omitempty"`
 	CacheBuster     string `json:"z,omitempty"`
 
+	// User
 	ClientID string `json:"cid,omitempty"`
 	UserID   string `json:"uid,omitempty"`
 
+	// Session
 	SessionControl       string `json:"sc,omitempty"`
 	IPOverride           string `json:"uip,omitempty"`
 	UserAgentOverride    string `json:"ua,omitempty"`
 	GeographicalOverride string `json:"geoid,omitempty"`
 
+	// Traffic Sources
 	DocumentReferrer   string `json:"dr,omitempty"`
 	CampaignName       string `json:"cn,omitempty"`
 	CampaignSource     string `json:"cs,omitempty"`
@@ -81,6 +91,7 @@ type Client struct {
 	GoogleAdWordsID    string `json:"gclid,omitempty"`
 	GoogleDisplayAdsID string `json:"dclid,omitempty"`
 
+	// System Info
 	ScreenResolution string `json:"sr,omitempty"`
 	ViewportSize     string `json:"vp,omitempty"`
 	DocumentEncoding string `json:"de,omitempty"`
@@ -89,9 +100,11 @@ type Client struct {
 	JavaEnabled      string `json:"je,omitempty"`
 	FlashVersion     string `json:"fl,omitempty"`
 
+	// Hit
 	HitType           string `json:"t,omitempty"`
 	NonInteractionHit string `json:"ni,omitempty"`
 
+	// Content Information
 	DocumentLocationURL string   `json:"dl,omitempty"`
 	DocumentHostName    string   `json:"dh,omitempty"`
 	DocumentPath        string   `json:"dp,omitempty"`
@@ -100,16 +113,19 @@ type Client struct {
 	ContentGroup        []string `json:"cg,omitempty"`
 	LinkID              string   `json:"linkid,omitempty"`
 
+	// App Tracking
 	ApplicationName        string `json:"an,omitempty"`
 	ApplicationID          string `json:"aid,omitempty"`
 	ApplicationVersion     string `json:"av,omitempty"`
 	ApplicationInstallerID string `json:"aiid,omitempty"`
 
+	// Event Tracking
 	EventCategory string `json:"ec,omitempty"`
 	EventAction   string `json:"ea,omitempty"`
 	EventLabel    string `json:"el,omitempty"`
 	EventValue    string `json:"ev,omitempty"`
 
+	// E-Commerce
 	TransactionID          string `json:"ti,omitempty"`
 	TransactionAffiliation string `json:"ta,omitempty"`
 	TransactionRevenue     string `json:"tr,omitempty"`
@@ -123,6 +139,7 @@ type Client struct {
 	ItemCode     string `json:"ic,omitempty"`
 	ItemCategory string `json:"iv,omitempty"`
 
+	// Enhanced E-Commerce
 	Products           []*Product           `json:"pr,omitempty"`
 	ProductImpressions []*ProductImpression `json:"il,omitempty"`
 	Promotions         []*Promotion         `json:"promo,omitempty"`
@@ -132,10 +149,12 @@ type Client struct {
 	CheckoutStepOption string `json:"col,omitempty"`
 	CurrencyCode       string `json:"cu,omitempty"`
 
+	// Social Interactions
 	SocialNetwork      string `json:"sn,omitempty"`
 	SocialAction       string `json:"sa,omitempty"`
 	SocialActionTarget string `json:"st,omitempty"`
 
+	// Timing
 	UserTimingCategory     string `json:"utc,omitempty"`
 	UserTimingVariableName string `json:"utv,omitempty"`
 	UserTimingTime         string `json:"utt,omitempty"`
@@ -150,16 +169,16 @@ type Client struct {
 	DOMInteractiveTime   string `json:"dit,omitempty"`
 	ContentLoadTime      string `json:"clt,omitempty"`
 
+	// Exceptions
 	ExceptionDescription string `json:"exd,omitempty"`
 	IsExceptionFatal     string `json:"exf,omitempty"`
 
-	CustomDimension []string `json:"cd,omitempty"`
-	CustomMetric    []string `json:"cm,omitempty"`
-
+	// Content Experiments
 	ExperimentID      string `json:"xid,omitempty"`
 	ExperimentVariant string `json:"xvar,omitempty"`
 }
 
+// ParseStruct returns parsed client data
 func (api *API) ParseStruct(prefix string, data map[string]interface{}) (values []string) {
 	for k, v := range data {
 		if k != "" && v != nil {
@@ -206,6 +225,7 @@ func (api *API) ParseStruct(prefix string, data map[string]interface{}) (values 
 	return values
 }
 
+// ParseQuery returns encoded post data
 func (api *API) ParseQuery(str string) string {
 	u, _ := url.Parse(str)
 	q := u.Query()
@@ -214,6 +234,7 @@ func (api *API) ParseQuery(str string) string {
 	return strings.TrimLeft(ret, "?")
 }
 
+// Send client data to GA
 func (api *API) Send(client *Client) string {
 	var apidata []string
 	var iface map[string]interface{}
