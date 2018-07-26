@@ -9,6 +9,7 @@ func main() {
 	api := new(ga.API)
 	api.Lock()
 	defer api.Unlock()
+
 	client := new(ga.Client)
 	client.ProtocolVersion = "1"
 	client.TrackingID = "UA-xxxxxxxx-xx"
