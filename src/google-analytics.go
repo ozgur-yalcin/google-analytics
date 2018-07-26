@@ -187,11 +187,11 @@ func (api *API) ParseStruct(prefix string, data map[string]interface{}) (values 
 						decoder := json.NewDecoder(r)
 						decoder.UseNumber()
 						decoder.Decode(&iface)
-						values = append(values, api.ParseStruct(prefix+k+fmt.Sprintf("%v", i), iface)...)
+						values = append(values, api.ParseStruct(prefix+k+fmt.Sprintf("%v", i+1), iface)...)
 					default:
 						d := fmt.Sprintf("%v", t)
 						if d != "" && d != "0" {
-							values = append(values, prefix+k+fmt.Sprintf("%v", i)+"="+d)
+							values = append(values, prefix+k+fmt.Sprintf("%v", i+1)+"="+d)
 						}
 					}
 				}
@@ -225,6 +225,7 @@ func (api *API) Send(client *Client) string {
 	decoder.Decode(&iface)
 	apidata = api.ParseStruct("", iface)
 	postdata := api.ParseQuery("?" + strings.Join(apidata, "&"))
+	fmt.Println(postdata)
 	cli := new(http.Client)
 	req, err := http.NewRequest("POST", config.ApiUrl, strings.NewReader(postdata))
 	if err != nil {

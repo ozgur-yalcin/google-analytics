@@ -16,9 +16,8 @@ go get github.com/OzqurYalcin/google-analytics
 package main
 
 import (
-	"fmt"
-
 	"github.com/OzqurYalcin/google-analytics/src"
+	"github.com/google/uuid"
 )
 
 func main() {
@@ -28,21 +27,24 @@ func main() {
 	client := new(ga.Client)
 	client.ProtocolVersion = "1"
 	client.TrackingID = "UA-xxxxxxxx-xx"
+	client.DataSource = "web"
+	client.ClientID = uuid.New().String()
 	client.HitType = "transaction"
 
 	product := new(ga.Product)
-	product.Name = "-"
-	product.Price = "0.00"
+	product.SKU = "P1234"
+	product.Name = "test"
+	product.Brand = "test"
+	product.Price = "25.00"
 	product.Quantity = "1"
-	product.Brand = "-"
 	product.Action = "purchase"
 	client.Products = append(client.Products, product)
 
-	client.TransactionID = ""
-	client.TransactionRevenue = "0.00"
+	client.TransactionID = "1111"
+	client.TransactionRevenue = "25.00"
+	client.TransactionTax = "0.00"
 
 	client.CurrencyCode = "USD"
-	response := api.Send(client)
-	fmt.Println(response)
+	api.Send(client)
 }
 ```
