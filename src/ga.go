@@ -259,9 +259,9 @@ func (api *API) Send(client *Client) string {
 	if err != nil {
 		return err.Error()
 	} else {
-		fmt.Println(config.ApiUrl)
-		fmt.Println(postdata)
-		fmt.Println(res.Status)
+		//fmt.Println(config.ApiUrl)
+		//fmt.Println(postdata)
+		//fmt.Println(res.Status)
 	}
 	defer res.Body.Close()
 	read, err := ioutil.ReadAll(res.Body)
