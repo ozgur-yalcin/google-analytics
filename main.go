@@ -39,7 +39,7 @@ func view(w http.ResponseWriter, r *http.Request) {
 	client.Products = append(client.Products, product)
 	client.ProductAction = "purchase"
 	client.TransactionID = "T1234"
-	client.TransactionRevenue = "33.00"
+	client.TransactionRevenue = "1.00"
 	client.CurrencyCode = "TRY"
 
 	if r.URL.Path == "/" {
