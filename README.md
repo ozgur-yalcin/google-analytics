@@ -16,43 +16,49 @@ go get github.com/OzqurYalcin/google-analytics
 package main
 
 import (
+	"net/http"
+	"time"
+
 	"github.com/OzqurYalcin/google-analytics/src"
 	"github.com/google/uuid"
 )
 
 func main() {
+	http.HandleFunc("/", view)
+	server := http.Server{Addr: ":8080", ReadTimeout: 30 * time.Second, WriteTimeout: 30 * time.Second}
+	server.ListenAndServe()
+}
+
+func view(w http.ResponseWriter, r *http.Request) {
 	api := new(ga.API)
 	api.Lock()
 	defer api.Unlock()
+	api.UserAgent = r.UserAgent()
+	api.ContentType = "application/x-www-form-urlencoded"
 
 	client := new(ga.Client)
 	client.ProtocolVersion = "1"
-	client.TrackingID = "UA-xxxxxxxx-xx"
-	client.DataSource = "web"
-	client.HitType = "pageview"
-	client.DocumentHostName = "example.com"
-	client.DocumentPath = "/payment"
-	client.DocumentTitle = "Payment"
 	client.ClientID = uuid.New().String()
+	client.TrackingID = "UA-xxxxxxxx-x"
+	client.HitType = "pageview"
+	client.DocumentLocationURL = "https://www.example.com/payment"
+	client.DocumentTitle = "Payment"
+	client.DocumentEncoding = "UTF-8"
 
 	product := new(ga.Product)
-	product.Action = "purchase"
 	product.SKU = "P1234"
-	product.Name = "name"
-	product.Brand = "brand"
-	product.Category = "category"
-	product.Variant = "variant"
-	product.Price = "25.00"
+	product.Name = "product name"
+	product.Brand = "product brand"
+	product.Price = "1.00"
 	product.Quantity = "1"
-	product.Position = "1"
 	client.Products = append(client.Products, product)
-
+	client.ProductAction = "purchase"
 	client.TransactionID = "T1234"
-	client.TransactionAffiliation = "affiliation"
-	client.TransactionRevenue = "25.00"
-	client.TransactionTax = "1.00"
+	client.TransactionRevenue = "33.00"
 	client.CurrencyCode = "TRY"
 
-	api.Send(client)
+	if r.URL.Path == "/" {
+		api.Send(client)
+	}
 }
 ```
