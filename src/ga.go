@@ -17,6 +17,8 @@ import (
 // API with mutex locking
 type API struct {
 	sync.Mutex
+	UserAgent   string
+	ContentType string
 }
 
 // Product data
@@ -32,8 +34,6 @@ type Product struct {
 	Position        string   `json:"ps,omitempty"`
 	CustomDimension []string `json:"cd,omitempty"`
 	CustomMetric    []string `json:"cm,omitempty"`
-	Action          string   `json:"pa,omitempty"`
-	ActionList      string   `json:"pal,omitempty"`
 }
 
 // ProductImpression data
@@ -143,6 +143,8 @@ type Client struct {
 	Products           []*Product           `json:"pr,omitempty"`
 	ProductImpressions []*ProductImpression `json:"il,omitempty"`
 	Promotions         []*Promotion         `json:"promo,omitempty"`
+	ProductAction      string               `json:"pa,omitempty"`
+	ProductActionList  string               `json:"pal,omitempty"`
 	PromotionAction    string               `json:"promoa,omitempty"`
 
 	CheckoutStep       string `json:"cos,omitempty"`
@@ -251,8 +253,8 @@ func (api *API) Send(client *Client) string {
 	if err != nil {
 		return err.Error()
 	}
-	req.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.99 Safari/537.36")
-	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("User-Agent", api.UserAgent)
+	req.Header.Set("Content-Type", api.ContentType)
 	res, err := cli.Do(req)
 	if err != nil {
 		return err.Error()
