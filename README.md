@@ -1,4 +1,5 @@
-[![Build Status](https://travis-ci.org/OzqurYalcin/google-analytics.svg?branch=master)](https://travis-ci.org/OzqurYalcin/google-analytics) [![Build Status](https://circleci.com/gh/OzqurYalcin/google-analytics.svg?style=svg)](https://circleci.com/gh/OzqurYalcin/google-analytics) [![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/OzqurYalcin/google-analytics/blob/master/LICENSE.md)
+[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/OzqurYalcin/google-analytics/blob/master/LICENSE.md)
+[![documentation](https://pkg.go.dev/badge/github.com/OzqurYalcin/google-analytics)](https://pkg.go.dev/github.com/OzqurYalcin/google-analytics/src)
 
 # Google-Analytics
 An easy-to-use Google Analytics API (v1) via Measurement Protocol with golang
