@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/OzqurYalcin/google-analytics/src"
+	ga "github.com/OzqurYalcin/google-analytics/src"
 	"github.com/google/uuid"
 )
 
@@ -16,8 +16,6 @@ func main() {
 
 func view(w http.ResponseWriter, r *http.Request) {
 	api := new(ga.API)
-	api.Lock()
-	defer api.Unlock()
 	api.UserAgent = r.UserAgent()
 	api.ContentType = "application/x-www-form-urlencoded"
 

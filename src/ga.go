@@ -9,14 +9,13 @@ import (
 	"net/url"
 	"reflect"
 	"strings"
-	"sync"
-
-	"github.com/OzqurYalcin/google-analytics/config"
 )
 
-// API with mutex locking
+// API url
+const ApiUrl = "https://www.google-analytics.com/collect"
+
+// API data
 type API struct {
-	sync.Mutex
 	UserAgent   string
 	ContentType string
 }
@@ -249,7 +248,7 @@ func (api *API) Send(client *Client) string {
 	apidata = api.ParseStruct("", iface)
 	postdata := api.ParseQuery("?" + strings.Join(apidata, "&"))
 	cli := new(http.Client)
-	req, err := http.NewRequest("POST", config.ApiUrl, strings.NewReader(postdata))
+	req, err := http.NewRequest("POST", ApiUrl, strings.NewReader(postdata))
 	if err != nil {
 		return err.Error()
 	}
@@ -259,7 +258,7 @@ func (api *API) Send(client *Client) string {
 	if err != nil {
 		return err.Error()
 	} else {
-		//fmt.Println(config.ApiUrl)
+		//fmt.Println(ApiUrl)
 		//fmt.Println(postdata)
 		//fmt.Println(res.Status)
 	}
