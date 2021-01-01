@@ -53,7 +53,7 @@ func view(w http.ResponseWriter, r *http.Request) {
 	client.TransactionRevenue = "1.00"
 	client.CurrencyCode = "TRY"
 
-	if r.URL.Path == "/" {
+	if r.URL.Path == "/" { // favicon blocker
 		api.Send(client)
 	}
 }
