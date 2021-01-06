@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"time"
 
-	ga "github.com/OzqurYalcin/google-analytics/src"
 	"github.com/google/uuid"
+	ga "github.com/ozgur-soft/google-analytics/src"
 )
 
 func main() {

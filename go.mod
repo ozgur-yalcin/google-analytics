@@ -1,4 +1,4 @@
-module github.com/OzqurYalcin/google-analytics
+module github.com/ozgur-soft/google-analytics
 
 go 1.15
 
