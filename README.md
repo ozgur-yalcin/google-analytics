@@ -1,12 +1,12 @@
-[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/ozgur-soft/google-analytics/blob/master/LICENSE.md)
-[![documentation](https://pkg.go.dev/badge/github.com/ozgur-soft/google-analytics)](https://pkg.go.dev/github.com/ozgur-soft/google-analytics/src)
+[![license](https://img.shields.io/:license-mit-blue.svg)](https://github.com/ozgur-yalcin/google-analytics/blob/master/LICENSE.md)
+[![documentation](https://pkg.go.dev/badge/github.com/ozgur-yalcin/google-analytics)](https://pkg.go.dev/github.com/ozgur-yalcin/google-analytics/src)
 
 # Google-Analytics
 An easy-to-use Google Analytics API (v1) via Measurement Protocol with golang
 
 # Installation
 ```bash
-go get github.com/ozgur-soft/google-analytics
+go get github.com/ozgur-yalcin/google-analytics
 ```
 
 # Measuring Purchases Example
@@ -17,7 +17,7 @@ import (
 	"net/http"
 	"time"
 
-	ga "github.com/ozgur-soft/google-analytics/src"
+	ga "github.com/ozgur-yalcin/google-analytics/src"
 	"github.com/google/uuid"
 )
 
